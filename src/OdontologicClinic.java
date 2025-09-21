@@ -15,6 +15,13 @@ public class OdontologicClinic {
     private static final String SQL_UPDATE = "UPDATE  DENTIST SET NAME= ? WHERE ID = ?";
 
     private static final String SQL_SELECT_ID = "SELECT * FROM DENTIST WHERE ID = ?";
+
+    private static final String SQL_BORRAR_REGISTRO = "DELETE FROM DENTIST WHERE ID =?";
+
+
+
+
+
     public static void main(String[] args) throws SQLException {
 
 
@@ -72,12 +79,6 @@ public class OdontologicClinic {
 
             connection.setAutoCommit(true);
 
-            // consultamos valor modificado
-
-
-
-
-
 
 
 
@@ -104,11 +105,31 @@ public class OdontologicClinic {
             ResultSet rs2 = chequeoDatos.executeQuery();
 
             while (rs2.next()) {
-                System.out.println("Los valores actualizados en la tabla son " +
+                System.out.println("El registro cuyo valor ha sido actualizado en la tabla es: " +
                         "ID: " + rs2.getInt(1) +  " - Matricula: " +
                         rs2.getInt(2) + " - Nombre: " + rs2.getString(3) +
                         " - Apellido: " + rs2.getString(4));
             }
+
+            // Borramos un registro
+
+            PreparedStatement borrarRegistro = connection.prepareStatement(SQL_BORRAR_REGISTRO);
+
+            borrarRegistro.setInt(1,dentist1.getId());
+            borrarRegistro.execute();
+            connection.commit();
+            connection.setAutoCommit(true);
+
+
+
+
+
+
+
+
+
+
+
 
 
         } catch (Exception ex) {
@@ -118,6 +139,34 @@ public class OdontologicClinic {
                 connection.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
+            }
+        }
+
+        // Chequear que se hayan borrado los datos
+        try {
+
+
+            connection = getConnection();
+
+            Statement statement = connection.createStatement();
+
+            ResultSet rFinal = statement.executeQuery(SQL_SELECT_ALL);
+
+            while (rFinal.next()) {
+                System.out.println("Luego de borrado el registro queda: " +
+                        "ID: " + rFinal.getInt(1) +  " - Matricula: " +
+                        rFinal.getInt(2) + " - Nombre: " + rFinal.getString(3) +
+                        " - Apellido: " + rFinal.getString(4));
+            }
+
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                connection.close();
+            } catch (Exception close) {
+                close.printStackTrace();
             }
         }
 
